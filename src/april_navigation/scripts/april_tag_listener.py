@@ -1,15 +1,17 @@
 #!/usr/bin/env python  
 
-#import roslib
-#roslib.load_manifest('learning_tf')
 import rospy
 import math
 import tf
 from april_navigation.msg import AprilTag
 import geometry_msgs.msg
 
-# Given the 
-def check_for_tag(tag_frame):
+def check_for_tag(listener, tag_frame):
+    """ 
+    Given a tf_listener and the name of the tag frame, 
+    return its coordinates if it is visible, and None 
+    if it is not visible.
+    """
     try:
         (trans,rot) = listener.lookupTransform('/map', tag_frame, rospy.Time(0))
     except (tf.LookupException, tf.ConnectivityException, tf.ExtrapolationException):
@@ -36,7 +38,7 @@ if __name__ == '__main__':
     
     while not rospy.is_shutdown():
         for tag_name in tag_names:
-            coordinates = check_for_tag(tag_name)
+            coordinates = check_for_tag(listerner, tag_name)
             if coordinates is not None:
                 # (x, y) = coordinates
                 tag_store[tag_name] = coordinates
