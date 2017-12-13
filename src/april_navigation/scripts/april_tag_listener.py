@@ -38,7 +38,7 @@ if __name__ == '__main__':
     
     while not rospy.is_shutdown():
         for tag_name in tag_names:
-            coordinates = check_for_tag(listerner, tag_name)
+            coordinates = check_for_tag(listener, tag_name)
             if coordinates is not None:
                 # (x, y) = coordinates
                 tag_store[tag_name] = coordinates
