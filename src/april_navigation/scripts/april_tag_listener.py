@@ -26,6 +26,7 @@ if __name__ == '__main__':
     listener = tf.TransformListener()
 
     pub = rospy.Publisher('/april_tags_locations', AprilTag, queue_size=10)
+    pub2 = rospy.Publisher('/april_tags', geometry_msgs.msg.PointStamped, queue_size=10)
     move_pub = rospy.Publisher('move_base_simple/goal', geometry_msgs.msg.PoseStamped, queue_size=10)
 
     t = 0
@@ -52,6 +53,13 @@ if __name__ == '__main__':
             tag_loc.point.x = x
             tag_loc.point.y = y
             pub.publish(tag_loc)
+
+            tag_loc = geometry_msgs.msg.PointStamped()
+            tag_loc.header.frame_id = "/map"
+            tag_loc.point.x = x
+            tag_loc.point.y = y
+            pub2.publish(tag_loc)
+
         
         print tag_store
 

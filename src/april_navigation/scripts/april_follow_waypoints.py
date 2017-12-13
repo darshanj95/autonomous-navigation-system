@@ -4,9 +4,10 @@ import rospy
 import geometry_msgs.msg
 from move_base_example import GoToPose
 from april_navigation.msg import AprilTag
+from kill_frontier import kill_frontier
 
 tag_store = {}
-num_tags = 3 #MAGIC NUMBER
+num_tags = 4 #MAGIC NUMBER
 following_waypoints = False
 
 def tag_location_callback(tag):
@@ -21,6 +22,7 @@ def tag_location_callback(tag):
 
 def follow_waypoints():
     print "Following Waypoints"
+    kill_frontier()
     navigator = GoToPose()
     for tag_id in tag_store:
         print "Navigating to", tag_id, "\n\n\n"
