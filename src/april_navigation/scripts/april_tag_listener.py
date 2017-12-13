@@ -21,9 +21,9 @@ def check_for_tag(listener, tag_frame):
     (rx, ry, rz) = robot_trans
 
     # Compute target point
-    d = 1.0
+    d = 1.0 # m
     sq_dist = ((y - ry)**2 + (x - rx)**2)
-    ratio = d**2 / sq_dist
+    ratio = (d**2) / sq_dist
 
     return (x + (ratio * (x - rx)), y + (ratio * (y - ry)), sq_dist)
 

@@ -8,6 +8,7 @@ from kill_frontier import kill_frontier
 import roslib; roslib.load_manifest('sound_play')
 from sound_play.libsoundplay import SoundClient
 from sound_play.msg import SoundRequest
+import tf
 
 
 tag_store = {}
@@ -29,6 +30,7 @@ def follow_waypoints():
     kill_frontier()
     navigator = GoToPose()
     tags_visited = []
+    listener = tf.TransformListener()
     while len(tags_visited) < num_tags:
         for tag_id in tag_order:
             if tag_id in tag_store and tag_id not in tags_visited:
@@ -42,8 +44,14 @@ def follow_waypoints():
                 
                     rospy.loginfo("Go to (%s, %s) pose", position['x'], position['y'])
                     success = navigator.goto(position, quaternion)
+
+                    (robot_trans,robot_rot) = listener.lookupTransform('/map', '/odom', rospy.Time(0))
+
+                    (rx, ry, rz) = robot_trans
+
+                    sq_dist = (tag.y - ry)**2 + (tag.x - rx)**2
                 
-                    if success:
+                    if success or sq_dist < 1.0:
                         tags_visited.append(tag_id)
                         speak(tag_id)
                         rospy.loginfo("Hooray, reached the desired pose")

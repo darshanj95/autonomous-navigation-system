@@ -51,15 +51,17 @@ class GoToPose():
                                      Quaternion(quat['r1'], quat['r2'], quat['r3'], quat['r4']))
 
         # Start moving
-        self.move_base.send_goal(goal)
+        success = self.move_base.send_goal_and_wait(goal,
+                                                    rospy.Duration(75),
+                                                    rospy.Duration(60))
 
         # Allow TurtleBot up to 60 seconds to complete task
-        success = self.move_base.wait_for_result(rospy.Duration(60))
+        #success = self.move_base.wait_for_result(rospy.Duration(60))
 
         state = self.move_base.get_state()
         result = False
 
-        if success and state == GoalStatus.SUCCEEDED:
+        if state == GoalStatus.SUCCEEDED:
             # We made it!
             result = True
         else:
