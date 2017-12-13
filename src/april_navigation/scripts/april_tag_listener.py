@@ -14,10 +14,18 @@ def check_for_tag(listener, tag_frame):
     """
     try:
         (trans,rot) = listener.lookupTransform('/map', tag_frame, rospy.Time(0))
+        (robot_trans,robot_rot) = listener.lookupTransform('/map', '/odom', rospy.Time(0))
     except (tf.LookupException, tf.ConnectivityException, tf.ExtrapolationException):
         return None
     (x, y, z) = trans
-    return (x, y)
+    (rx, ry, rz) = robot_trans
+
+    # Compute target point
+    d = 1.0
+    sq_dist = ((y - ry)**2 + (x - rx)**2)
+    ratio = d**2 / sq_dist
+
+    return (x + (ratio * (x - rx)), y + (ratio * (y - ry)), sq_dist)
 
 
 if __name__ == '__main__':
@@ -42,14 +50,21 @@ if __name__ == '__main__':
             coordinates = check_for_tag(listener, tag_name)
             if coordinates is not None:
                 # (x, y) = coordinates
-                tag_store[tag_name] = coordinates
+                (x, y, dist) = coordinates
+                if tag_name not in tag_store:
+                    tag_store[tag_name] = coordinates
+                else:
+                    (prev_x, prev_y, prev_dist) = tag_store[tag_name]
+                    if dist <= prev_dist:
+                        tag_store[tag_name] = coordinates
+                
 
         for tag_name in tag_store:
             #publish
             tag_loc = AprilTag()
             tag_loc.header.frame_id = "/map"
             tag_loc.id = tag_name
-            (x, y) = tag_store[tag_name]
+            (x, y, distance) = tag_store[tag_name]
             tag_loc.point.x = x
             tag_loc.point.y = y
             pub.publish(tag_loc)

@@ -29,31 +29,32 @@ def follow_waypoints():
     kill_frontier()
     navigator = GoToPose()
     tags_visited = []
-    for tag_id in tag_order:
-        if tag_id in tag_store and tag_id not in tags_visited:
-            print "Navigating to", tag_id, "\n\n\n"
-            tag = tag_store[tag_id]
+    while len(tags_visited) < num_tags:
+        for tag_id in tag_order:
+            if tag_id in tag_store and tag_id not in tags_visited:
+                print "Navigating to", tag_id, "\n\n\n"
+                tag = tag_store[tag_id]
         
-            try:
-                # Customize the following values so they are appropriate for your location
-                position = {'x': tag.x, 'y' : tag.y}
-                quaternion = {'r1' : 0.000, 'r2' : 0.000, 'r3' : 0.000, 'r4' : 1.000}
+                try:
+                    # Customize the following values so they are appropriate for your location
+                    position = {'x': tag.x, 'y' : tag.y}
+                    quaternion = {'r1' : 0.000, 'r2' : 0.000, 'r3' : 0.000, 'r4' : 1.000}
                 
-                rospy.loginfo("Go to (%s, %s) pose", position['x'], position['y'])
-                success = navigator.goto(position, quaternion)
+                    rospy.loginfo("Go to (%s, %s) pose", position['x'], position['y'])
+                    success = navigator.goto(position, quaternion)
                 
-                if success:
-                    tags_visited.append(tag_id)
-                    speak(tag_id)
-                    rospy.loginfo("Hooray, reached the desired pose")
-                else:
-                    rospy.loginfo("The base failed to reach the desired pose")
+                    if success:
+                        tags_visited.append(tag_id)
+                        speak(tag_id)
+                        rospy.loginfo("Hooray, reached the desired pose")
+                    else:
+                        rospy.loginfo("The base failed to reach the desired pose")
 
-                # Sleep to give the last log messages time to be sent
-                rospy.sleep(1)
+                        # Sleep to give the last log messages time to be sent
+                    rospy.sleep(1)
 
-            except rospy.ROSInterruptException:
-                rospy.loginfo("Ctrl-C caught. Quitting")
+                except rospy.ROSInterruptException:
+                    rospy.loginfo("Ctrl-C caught. Quitting")
 
 
 def speak(text):
